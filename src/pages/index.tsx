@@ -1,14 +1,9 @@
-import { Inter } from "next/font/google";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
 import React, { useMemo } from "react";
-import Player from "video.js/dist/types/player";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
   const videoRef = React.useRef<any>(null);
-  const playerRef: React.MutableRefObject<Player | null> = React.useRef(null);
 
   const options = useMemo(
     () => ({
@@ -33,11 +28,18 @@ export default function Home() {
     if (videoRef.current) {
       const video = videoRef.current;
 
-      playerRef.current = videojs(video, options, () => {
+      const player = videojs(video, options, () => {
         console.log("Player is ready");
       });
+
+      return () => {
+        console.log("cleanup");
+        if (player && !player.isDisposed()) {
+          player.dispose();
+        }
+      };
     }
-  }, [options, playerRef]);
+  }, [options]);
 
   return (
     <>
